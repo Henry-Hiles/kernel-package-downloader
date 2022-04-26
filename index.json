@@ -1,6 +1,6 @@
 {
-    "name": "PluginTemplate",
-    "id": "plugin-template",
-    "description": "A template for future Kernel plugin development.",
-    "dependencies": []
+    "name": "Kernel Package Downloader",
+    "id": "kernel-package-downloader",
+    "description": "A package downloader for kernel.",
+    "dependencies": ["strencher.webpack"]
 }
