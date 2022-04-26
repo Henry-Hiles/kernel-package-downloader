@@ -1,6 +1,6 @@
 # Kernel Package Downloader
 
-A package for the [kernel client mod](https://github.com/kernel-mod/) to download other packages from the #packages-link channel with a single click. (Compatable with openasar)
+A package for the [kernel client mod](https://github.com/kernel-mod/) to download other packages from the #package-list channel with a single click. (Compatable with openasar)
 
 ![button](https://i.imgur.com/miKZto9.png)
 
