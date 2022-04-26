@@ -9,20 +9,18 @@ const execWithPromise = async (command, options) =>
         )
     )
 
-contextBridge.exposeInMainWorld("package", {
-    install: async (link) => {
-        const packagesPath = resolve(__dirname, "..")
-        try {
-            await execWithPromise(`git clone ${link[0]}`, {
-                cwd: packagesPath,
-            })
+contextBridge.exposeInMainWorld("installPackage", async (link) => {
+    const packagesPath = resolve(__dirname, "..")
+    try {
+        await execWithPromise(`git clone ${link[0]}`, {
+            cwd: packagesPath,
+        })
 
-            await execWithPromise("pnpm i --production", {
-                cwd: join(packagesPath, link[7]),
-            })
-        } catch (error) {
-            console.error(error)
-            return true
-        }
-    },
+        await execWithPromise("pnpm i --production", {
+            cwd: join(packagesPath, link[7]),
+        })
+    } catch (error) {
+        console.error(error)
+        return true
+    }
 })

@@ -2,8 +2,13 @@
 
 export default new (class PackageDownloader {
     async start() {
+        const pluginLog = (msg, logFunc = console.info) =>
+            logFunc(`%c[${this.constructor.name}] `, "color:#14bbaa", msg)
+
+        pluginLog("Started successfully")
+
         await Webpack.whenReady
-        const { React } = window.Webpack.common
+        const { React } = Webpack.common
         const MiniPopover = Webpack.findByDisplayName("MiniPopover", {
             default: true,
         })
@@ -27,103 +32,91 @@ export default new (class PackageDownloader {
                 props.channel.id == "899717501120806963"
             )
                 args[0].children.unshift(
-                    React.createElement(
-                        (componentProps) => {
-                            const [disabled, setDisabled] =
-                                React.useState(false)
-                            const props = componentProps.props
+                    React.createElement(() => {
+                        const [disabled, setDisabled] = React.useState(false)
 
-                            const gitURL = props.message.content
-                                .slice(
-                                    props.message.content.indexOf("Repository")
-                                )
-                                .match(
-                                    /((git@|http(s)?:\/\/)([\w\.@]+)(\/|:))([\w,\-,\_]+)\/([\w,\-,\_]+)(.git){0,1}((\/){0,1})/
-                                )
+                        const gitURL = props.message.content
+                            .slice(props.message.content.indexOf("Repository"))
+                            .match(
+                                /((git@|http(s)?:\/\/)([\w\.@]+)(\/|:))([\w,\-,\_]+)\/([\w,\-,\_]+)(.git){0,1}((\/){0,1})/
+                            )
 
-                            if (!disabled)
-                                Object.values(
-                                    kernel.packages.getPackages()
-                                ).forEach((pkg) => {
-                                    if (pkg.path.split("/").at(-1) == gitURL[7])
-                                        setDisabled(true)
-                                })
+                        if (!disabled)
+                            Object.values(
+                                kernel.packages.getPackages()
+                            ).forEach((pkg) => {
+                                if (pkg.path.split("/").at(-1) == gitURL[7])
+                                    setDisabled(true)
+                            })
 
-                            return [
-                                React.createElement(
-                                    Tooltip,
-                                    {
-                                        position: "top",
-                                        text: disabled
-                                            ? "Already Installed"
-                                            : "Install Package",
-                                    },
-                                    (args) =>
-                                        React.createElement(
-                                            MiniPopover.Button,
-                                            {
-                                                ...args,
-                                                disabled: disabled,
-                                                onClick: async () => {
-                                                    setDisabled(true)
-                                                    const failed =
-                                                        await window.package.install(
-                                                            gitURL
-                                                        )
+                        return [
+                            React.createElement(
+                                Tooltip,
+                                {
+                                    position: "top",
+                                    text: disabled
+                                        ? "Already Installed"
+                                        : "Install Package",
+                                },
+                                (args) =>
+                                    React.createElement(
+                                        MiniPopover.Button,
+                                        {
+                                            ...args,
+                                            disabled: disabled,
+                                            onClick: async () => {
+                                                setDisabled(true)
+                                                const failed =
+                                                    await window.installPackage(
+                                                        gitURL
+                                                    )
 
-                                                    if (failed) {
-                                                        Toasts.showToast(
-                                                            Toasts.createToast(
-                                                                "Failed to install package",
-                                                                Toasts.ToastType
-                                                                    .ERROR
-                                                            )
+                                                if (failed) {
+                                                    Toasts.showToast(
+                                                        Toasts.createToast(
+                                                            "Failed to install package",
+                                                            Toasts.ToastType
+                                                                .ERROR
                                                         )
-                                                        console.error(
-                                                            `[${this.constructor.name}]`,
-                                                            "Package installation failed, error above."
+                                                    )
+                                                    pluginLog(
+                                                        "Package installation failed, error above.",
+                                                        console.error
+                                                    )
+                                                    setDisabled(false)
+                                                } else {
+                                                    Toasts.showToast(
+                                                        Toasts.createToast(
+                                                            "Successfully installed package! Please reload discord with Ctrl+R.",
+                                                            Toasts.ToastType
+                                                                .SUCCESS
                                                         )
-                                                        setDisabled(false)
-                                                    } else {
-                                                        Toasts.showToast(
-                                                            Toasts.createToast(
-                                                                "Successfully installed package! Please reload discord with Ctrl+R.",
-                                                                Toasts.ToastType
-                                                                    .SUCCESS
-                                                            )
-                                                        )
-                                                        console.log(
-                                                            `%c[${this.constructor.name}]`,
-                                                            "color:#14bbaa",
-                                                            "Successfully installed package! Please reload discord with Ctrl+R."
-                                                        )
-                                                    }
-                                                },
+                                                    )
+                                                    pluginLog(
+                                                        "Successfully installed package! Please reload discord with Ctrl+R."
+                                                    )
+                                                }
                                             },
-                                            React.createElement(
-                                                "svg",
-                                                {
-                                                    xmlns: "http://www.w3.org/2000/svg",
-                                                    width: "16",
-                                                    height: "16",
-                                                    fill: "currentColor",
-                                                    class: "bi bi-arrow-down-circle-fill",
-                                                    viewBox: "0 0 16 16",
-                                                },
-                                                React.createElement("path", {
-                                                    d: "M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z",
-                                                })
-                                            )
+                                        },
+                                        React.createElement(
+                                            "svg",
+                                            {
+                                                xmlns: "http://www.w3.org/2000/svg",
+                                                width: "16",
+                                                height: "16",
+                                                fill: "currentColor",
+                                                class: "bi bi-arrow-down-circle-fill",
+                                                viewBox: "0 0 16 16",
+                                            },
+                                            React.createElement("path", {
+                                                d: "M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z",
+                                            })
                                         )
-                                ),
-                                React.createElement(
-                                    MiniPopover.Separator,
-                                    null
-                                ),
-                            ]
-                        },
-                        { props }
-                    )
+                                    )
+                            ),
+                            React.createElement(MiniPopover.Separator),
+                        ]
+                    })
                 )
 
             return funcCopy.apply(this, args)
@@ -131,8 +124,11 @@ export default new (class PackageDownloader {
 
         Object.assign(MiniPopover.default, funcCopy)
 
+        pluginLog("Patched, ready to download packages!")
+
         this.stop = () => {
             MiniPopover.default = funcCopy
+            pluginLog("Stopped successfully")
         }
     }
 })()
