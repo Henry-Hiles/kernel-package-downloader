@@ -20,3 +20,5 @@ To install the webpack package:
 1. `cd <your kernel packages folder>`
 2. `git clone https://github.com/Henry-Hiles/kernel-package-downloader`
 3. Restart discord with `Ctrl+R`
+
+Huge thank you to the kernel devs and helper team for making this possible.
