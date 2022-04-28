@@ -60,10 +60,29 @@ export default new (class PackageDownloader {
                                     disabled: disabled,
                                     onClick: async () => {
                                         setDisabled(true)
-                                        const failed =
+
+                                        const reloadMessage =
                                             await window.installPackage(gitURL)
 
-                                        if (failed) {
+                                        if (reloadMessage) {
+                                            Toasts.showToast(
+                                                Toasts.createToast(
+                                                    `Successfully installed package! ${
+                                                        reloadMessage
+                                                            ? `${reloadMessage}.`
+                                                            : ""
+                                                    }`,
+                                                    Toasts.ToastType.SUCCESS
+                                                )
+                                            )
+                                            pluginLog(
+                                                `Successfully installed package! ${
+                                                    reloadMessage
+                                                        ? `${reloadMessage}.`
+                                                        : ""
+                                                }`
+                                            )
+                                        } else {
                                             Toasts.showToast(
                                                 Toasts.createToast(
                                                     "Failed to install package",
@@ -75,16 +94,6 @@ export default new (class PackageDownloader {
                                                 console.error
                                             )
                                             setDisabled(false)
-                                        } else {
-                                            Toasts.showToast(
-                                                Toasts.createToast(
-                                                    "Successfully installed package! Please reload discord with Ctrl+R.",
-                                                    Toasts.ToastType.SUCCESS
-                                                )
-                                            )
-                                            pluginLog(
-                                                "Successfully installed package! Please reload discord with Ctrl+R."
-                                            )
                                         }
                                     },
                                 },
