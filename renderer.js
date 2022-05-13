@@ -22,7 +22,7 @@ export default new (class PackageDownloader {
         const funcCopy = MiniPopover.default
 
         MiniPopover.default = (...args) => {
-            const props = args[0].children.at
+            const props = args[0].children.at?.(-1)
                 ? args[0].children.at(-1).props
                 : null
 
@@ -61,7 +61,7 @@ export default new (class PackageDownloader {
                                     onClick: async () => {
                                         setDisabled(true)
 
-                                        const reloadMessage =
+                                        const { reloadMessage, errorMessage } =
                                             await window.installPackage(gitURL)
 
                                         if (reloadMessage) {
@@ -85,12 +85,12 @@ export default new (class PackageDownloader {
                                         } else {
                                             Toasts.showToast(
                                                 Toasts.createToast(
-                                                    "Failed to install package",
+                                                    "Failed to install package, check console for error.",
                                                     Toasts.ToastType.ERROR
                                                 )
                                             )
                                             pluginLog(
-                                                "Package installation failed, error above.",
+                                                `Package installation failed: ${errorMessage}`,
                                                 console.error
                                             )
                                             setDisabled(false)
@@ -136,4 +136,4 @@ export default new (class PackageDownloader {
             pluginLog("Stopped successfully")
         }
     }
-})()
+})()``
