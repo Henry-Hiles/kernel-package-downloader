@@ -136,4 +136,4 @@ export default new (class PackageDownloader {
             pluginLog("Stopped successfully")
         }
     }
-})()``
+})()
