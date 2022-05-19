@@ -61,7 +61,7 @@ export default new (class PackageDownloader {
                                     onClick: async () => {
                                         setDisabled(true)
 
-                                        const { reloadMessage, errorMessage } =
+                                        const { reloadMessage, error } =
                                             await window.installPackage(gitURL)
 
                                         if (reloadMessage) {
@@ -90,7 +90,7 @@ export default new (class PackageDownloader {
                                                 )
                                             )
                                             pluginLog(
-                                                `Package installation failed: ${errorMessage}`,
+                                                `Package installation failed: ${error}`,
                                                 console.error
                                             )
                                             setDisabled(false)

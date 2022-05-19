@@ -12,9 +12,16 @@ contextBridge.exposeInMainWorld("installPackage", async (link) => {
             cwd: packagesPath,
         })
 
-        await exec("pnpm i --production", {
-            cwd: packagePath,
-        })
+        await exec(
+            `${
+                process.platform == "darwin"
+                    ? path.join(process.env.HOME, "Library", "pnpm", "pnpm")
+                    : "pnpm"
+            } i --production`,
+            {
+                cwd: packagePath,
+            }
+        )
 
         try {
             await promises.access(join(packagePath, "main.js"), constants.F_OK)
@@ -26,6 +33,6 @@ contextBridge.exposeInMainWorld("installPackage", async (link) => {
             return { reloadMessage: "Please reload discord with Ctrl+R" }
         }
     } catch (error) {
-        return { errorMessage: error }
+        return { error }
     }
 })
