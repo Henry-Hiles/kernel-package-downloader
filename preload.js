@@ -5,6 +5,10 @@ const { promises, constants } = require("fs")
 const exec = require("util").promisify(require("child_process").exec)
 
 contextBridge.exposeInMainWorld("installPackage", async (link) => {
+    if (process.platform === "darwin") {
+        process.env.PATH += `:/usr/local/bin:${process.env.HOME}/Library/pnpm`
+    }
+
     const packagesPath = resolve(__dirname, "..")
     const packagePath = join(packagesPath, link[7])
     try {
@@ -12,16 +16,9 @@ contextBridge.exposeInMainWorld("installPackage", async (link) => {
             cwd: packagesPath,
         })
 
-        await exec(
-            `${
-                process.platform == "darwin"
-                    ? path.join(process.env.HOME, "Library", "pnpm", "pnpm")
-                    : "pnpm"
-            } i --production`,
-            {
-                cwd: packagePath,
-            }
-        )
+        await exec(`pnpm i --production`, {
+            cwd: packagePath,
+        })
 
         try {
             await promises.access(join(packagePath, "main.js"), constants.F_OK)
