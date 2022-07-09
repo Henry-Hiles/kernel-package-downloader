@@ -120,7 +120,7 @@ export default new (class PackageDownloader {
             if (
                 props?.message &&
                 props.channel &&
-                props.channel.id == "899717501120806963"
+                props.channel?.id == "899717501120806963"
             )
                 args[0].children.unshift(React.createElement(Button))
 

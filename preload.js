@@ -1,6 +1,7 @@
 const { contextBridge } = require("electron")
 const { resolve, join } = require("path")
 const { promises, constants } = require("fs")
+const { access } = promises
 
 const exec = require("util").promisify(require("child_process").exec)
 
@@ -16,18 +17,27 @@ contextBridge.exposeInMainWorld("installPackage", async (link) => {
             cwd: packagesPath,
         })
 
-        await exec(`pnpm i --production`, {
-            cwd: packagePath,
-        })
+        try {
+            await access(join(packagePath, "package.json"), constants.F_OK)
+            try {
+                await exec(`pnpm i --production`, {
+                    cwd: packagePath,
+                })
+            } catch (error) {
+                console.error(error)
+            }
+        } catch {}
 
         try {
-            await promises.access(join(packagePath, "main.js"), constants.F_OK)
+            await access(join(packagePath, "main.js"), constants.F_OK)
             return {
                 reloadMessage:
                     "Main.js file detected: Please quit Discord from the system tray",
             }
         } catch (error) {
-            return { reloadMessage: "Please reload discord with Ctrl+R" }
+            return {
+                reloadMessage: "Please reload discord with Ctrl+R",
+            }
         }
     } catch (error) {
         return { error }
